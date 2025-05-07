@@ -1,31 +1,4 @@
 from __future__ import annotations
-
-"""
-canvas_refactored.py – Core logic extracted from the original *canvas.py*
------------------------------------------------------------------------
-This version focuses on clarity, reduced duplication, and lower constant‑factor
-costs while preserving the original public CLI behaviour.
-
-Key design changes
-==================
-1. **Functional decomposition & type hints** – makes the flow self‑documenting.
-2. **`ThreadPoolExecutor`** – simpler thread orchestration than manual
-   `Thread` objects + queues.
-3. **Connection reuse** – one `urllib.request.OpenerDirector` is shared by all
-   threads, giving us keep‑alive behaviour similar to a persistent `requests`
-   session without adding a third‑party dependency.
-4. **Early termination** – a shared `stop_event` halts work immediately on
-   non‑404/expected errors.
-5. **Memory footprint** – results are built incrementally; no large queue kept
-   alive after finishing.
-6. **Generator‑based id stream** – avoids pre‑allocating a list of potentially
-   millions of IDs.
-
-Time complexity is still **O(N)** for scanning *N* file IDs, but lower per‑item
-constants (fewer locks, simpler queue operations). Space complexity is now
-**O(k)** where *k* is the number of discovered files rather than *O(N)*.
-"""
-
 import argparse
 import json
 import logging
@@ -40,9 +13,7 @@ from threading import Event
 from typing import Iterable, List, Dict, Optional
 from urllib.parse import urlparse
 
-# ---------------------------------------------------------------------------
 # Logging
-# ---------------------------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s %(levelname)s] %(message)s",
@@ -50,10 +21,7 @@ logging.basicConfig(
 )
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
-
 def _parse_response(resp: urllib.response.addinfourl) -> Dict[str, str]:
     """Return a minimal dict describing the Canvas *file* resource."""
     content_type = resp.headers.get("Content-Type", "")
@@ -83,10 +51,7 @@ def _file_id_stream(start: int, count: int) -> Iterable[int]:
         yield fid
 
 
-# ---------------------------------------------------------------------------
 # Core worker logic
-# ---------------------------------------------------------------------------
-
 def _fetch_file(
         file_id: int,
         base_url: str,
@@ -112,8 +77,7 @@ def _fetch_file(
 
     except urllib.error.HTTPError as err:
         if err.code == 404:
-            return None  # normal – file id does not exist
-        # Fatal – signal peers and re‑raise to propagate message
+            return None
         stop_event.set()
         raise
     except Exception:
@@ -121,10 +85,7 @@ def _fetch_file(
         raise
 
 
-# ---------------------------------------------------------------------------
-# Public API – `scan_canvas_files`
-# ---------------------------------------------------------------------------
-
+# Public API - `scan_canvas_files`
 def scan_canvas_files(
         *,
         start_id: int,
@@ -181,10 +142,7 @@ def scan_canvas_files(
     return results
 
 
-# ---------------------------------------------------------------------------
 # CLI
-# ---------------------------------------------------------------------------
-
 def _validate_url(url: str) -> str:
     parsed = urlparse(url)
     if not (parsed.scheme and parsed.netloc):
@@ -232,5 +190,5 @@ def _cli() -> None:
     logging.info("Saved %d records → %s", len(hits), out_file)
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     _cli()
