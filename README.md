@@ -12,12 +12,12 @@ A fast, multithreaded tool that scans Canvas **file IDs** in reverse order to di
 
 | Capability                    | Description                                                                                                |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| 🔍 **Reverse ID sweep**       | Starts from a known `/files/<id>` URL and probes lower IDs, which is where Canvas allocates newer uploads. |
-| ⚡ **ThreadPoolExecutor**      | Up to 32 concurrent workers using persistent HTTP connections for high throughput.                         |
-| 🗄️ **Connection reuse**      | One shared opener keeps sockets alive—no external dependencies required.                                   |
-| 📄 **HTML *or* JSON parsing** | Works equally well with front‑end file pages or the `/api/v1/files/<id>` endpoint.                         |
-| 📦 **Structured JSON output** | Saves hits to `output/YYYYMMDD‑HHMMSS‑canvas-files.json` for easy post‑processing.                         |
-| 🛑 **Graceful early abort**   | Immediately stops every worker on a fatal HTTP status (≠ 404).                                             |
+|**Reverse ID sweep**       | Starts from a known `/files/<id>` URL and probes lower IDs, which is where Canvas allocates newer uploads. |
+|**ThreadPoolExecutor**      | Up to 32 concurrent workers using persistent HTTP connections for high throughput.                         |
+|**Connection reuse**      | One shared opener keeps sockets alive—no external dependencies required.                                   |
+|**HTML *or* JSON parsing** | Works equally well with front‑end file pages or the `/api/v1/files/<id>` endpoint.                         |
+|**Structured JSON output** | Saves hits to `output/YYYYMMDD‑HHMMSS‑canvas-files.json` for easy post‑processing.                         |
+|**Graceful early abort**   | Immediately stops every worker on a fatal HTTP status (≠ 404).                                             |
 
 ---
 
@@ -107,13 +107,4 @@ Use tools like `jq`, Python, or a spreadsheet to sort, filter, or bulk‑downloa
   IDs. A future enhancement could fetch folder listings to seed starting
   IDs automatically.
   
----
-
-## Contributing
-
-1. Fork & clone the repo.
-2. Create a feature branch off `main`.
-3. Run `python -m unittest discover` (coming soon) to ensure nothing breaks.
-4. Submit a pull request—describe what it changes and why.
-
 ---
